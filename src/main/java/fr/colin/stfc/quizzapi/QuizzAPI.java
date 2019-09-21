@@ -7,6 +7,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import fr.colin.stfc.quizzapi.objects.Category;
+import fr.colin.stfc.quizzapi.objects.CompletedQuizz;
 import fr.colin.stfc.quizzapi.objects.Questions;
 import fr.colin.stfc.quizzapi.objects.Quizz;
 
@@ -57,7 +58,7 @@ public class QuizzAPI {
         return questions;
     }
 
-    public Quizz fetchQuizz(String uuid){
+    public Quizz fetchQuizz(String uuid) {
 
         Request r = new Request.Builder().get().url(baseURL + "/fetch_quizz?uuid=" + uuid).build();
         try {
@@ -127,6 +128,24 @@ public class QuizzAPI {
             return Boolean.parseBoolean(HTTP_CLIENT.newCall(r).execute().body().string());
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public String sendCompletedQuizz(String dest, CompletedQuizz quizz) {
+        Request r = new Request.Builder().url(baseURL + "/send_completed_quizz?dest=" + dest).post(RequestBody.create(JSON, new Gson().toJson(quizz))).build();
+        try {
+            return HTTP_CLIENT.newCall(r).execute().body().string();
+        } catch (IOException e) {
+            return "Error";
+        }
+    }
+
+    public String addQuestionBulk(ArrayList<Questions> questions, String token) {
+        Request r = new Request.Builder().url(baseURL + "/add_question_bulk?token=" + token).post(RequestBody.create(JSON, new Gson().toJson(questions))).build();
+        try {
+            return HTTP_CLIENT.newCall(r).execute().body().string();
+        } catch (IOException e) {
+            return "Error";
         }
     }
 
