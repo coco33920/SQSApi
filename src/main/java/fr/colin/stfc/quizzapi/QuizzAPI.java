@@ -57,6 +57,18 @@ public class QuizzAPI {
         return questions;
     }
 
+    public Quizz fetchQuizz(String uuid){
+
+        Request r = new Request.Builder().get().url(baseURL + "/fetch_quizz?uuid=" + uuid).build();
+        try {
+            return new Gson().fromJson(HTTP_CLIENT.newCall(r).execute().body().string(), Quizz.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
     public Quizz getRandomQuizz(String category, int noq) {
         if (noq < 0) {
             noq = 3;
@@ -119,6 +131,6 @@ public class QuizzAPI {
     }
 
     public static void main(String[] args) {
-        System.out.println(DEFAULT_INSTANCE.getRandomQuizz("lol", 5).getQuestions().toString());
+        System.out.println(new Gson().toJson(DEFAULT_INSTANCE.fetchQuizz("4D5EA06F")));
     }
 }
