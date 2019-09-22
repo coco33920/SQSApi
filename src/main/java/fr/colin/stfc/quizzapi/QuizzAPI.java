@@ -149,6 +149,24 @@ public class QuizzAPI {
         }
     }
 
+    public String removeCategoriesBulk(ArrayList<String> cats, String token) {
+        Request r = new Request.Builder().url(baseURL + "/remove_category_bulk?token=" + token).post(RequestBody.create(JSON, new Gson().toJson(cats))).build();
+        try {
+            return HTTP_CLIENT.newCall(r).execute().body().string();
+        } catch (IOException e) {
+            return "Error";
+        }
+    }
+
+    public String removeQuestionsBulk(ArrayList<String> cats, String token) {
+        Request r = new Request.Builder().url(baseURL + "/remove_question_bulk?token=" + token).post(RequestBody.create(JSON, new Gson().toJson(cats))).build();
+        try {
+            return HTTP_CLIENT.newCall(r).execute().body().string();
+        } catch (IOException e) {
+            return "Error";
+        }
+    }
+
     public static void main(String[] args) {
         System.out.println(new Gson().toJson(DEFAULT_INSTANCE.fetchQuizz("4D5EA06F")));
     }
