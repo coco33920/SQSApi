@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class QuizzAPI {
-    public static QuizzAPI DEFAULT_INSTANCE = new QuizzAPI("http://localhost:6767");
+    public static QuizzAPI DEFAULT_INSTANCE = new QuizzAPI("https://sqs.nwa2coco.fr");
     private String baseURL;
     public static OkHttpClient HTTP_CLIENT = new OkHttpClient();
     private MediaType JSON = MediaType.parse("application/json");
