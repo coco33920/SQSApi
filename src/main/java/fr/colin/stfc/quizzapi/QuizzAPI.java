@@ -6,15 +6,18 @@ import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
-import fr.colin.stfc.quizzapi.objects.Category;
-import fr.colin.stfc.quizzapi.objects.CompletedQuizz;
-import fr.colin.stfc.quizzapi.objects.Questions;
-import fr.colin.stfc.quizzapi.objects.Quizz;
+import fr.colin.stfc.quizzapi.objects.*;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class QuizzAPI {
     public static QuizzAPI DEFAULT_INSTANCE = new QuizzAPI("https://sqs.nwa2coco.fr");
@@ -167,7 +170,38 @@ public class QuizzAPI {
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println(new Gson().toJson(DEFAULT_INSTANCE.fetchQuizz("4D5EA06F")));
+    public ArrayList<ArrayList<Scores>> fetchQuizzData(String startDate, String endDate, Long interval) {
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        return fetchQuizzData(format.parse(startDate, new ParsePosition(0)).getTime(), format.parse(endDate, new ParsePosition(0)).getTime(), interval);
+    }
+
+    public ArrayList<ArrayList<Scores>> fetchQuizzData(Long startDate, Long endDate, Long interval) {
+        Type type = new TypeToken<ArrayList<ArrayList<Scores>>>() {
+        }.getType();
+        Request r = new Request.Builder().post(RequestBody.create(JSON, new Gson().toJson(new RequestFetchQuizzs(startDate, endDate, interval)))).url(baseURL + "/fetch_quizz_data").build();
+        String b;
+        try {
+            b = HTTP_CLIENT.newCall(r).execute().body().string();
+        } catch (IOException e) {
+            return new ArrayList<>();
+        }
+        return new Gson().fromJson(b, type);
+    }
+
+    public static void main(String[] args) throws ParseException {
+
+        QuizzAPI q = new QuizzAPI("http://localhost:6767");
+
+        SimpleDateFormat ds = new SimpleDateFormat("dd/MM/yyyy 00:00:00");
+        String s = ds.format(new Date(System.currentTimeMillis()));
+        String sd = ds.format(new Date(System.currentTimeMillis() + 86400000L));
+        //    System.out.println(ds.parse(s, new ParsePosition(0)));
+        ArrayList<ArrayList<Scores>> scores = q.fetchQuizzData(s, sd, 1000L * 3600L);
+        System.out.println(scores.size());
+        for (ArrayList<Scores> sdd : scores) {
+            if (!sdd.isEmpty()) {
+                System.out.println(sdd.size());
+            }
+        }
     }
 }
