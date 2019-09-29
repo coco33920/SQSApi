@@ -175,6 +175,26 @@ public class QuizzAPI {
         return fetchQuizzData(format.parse(startDate, new ParsePosition(0)).getTime(), format.parse(endDate, new ParsePosition(0)).getTime(), interval);
     }
 
+    public ArrayList<ArrayList<Quizz>> fetchQuizz(String startDate, String endDate, Long interval) {
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        return fetchQuizz(format.parse(startDate, new ParsePosition(0)).getTime(), format.parse(endDate, new ParsePosition(0)).getTime(), interval);
+    }
+
+    public ArrayList<ArrayList<Quizz>> fetchQuizz(Long startDate, Long endDate, Long interval) {
+
+        Type type = new TypeToken<ArrayList<ArrayList<Quizz>>>() {
+        }.getType();
+
+        Request r = new Request.Builder().post(RequestBody.create(JSON, new Gson().toJson(new RequestFetchQuizzs(startDate, endDate, interval)))).url(baseURL + "/fetch_quizzs").build();
+        String b;
+        try {
+            b = HTTP_CLIENT.newCall(r).execute().body().string();
+        } catch (IOException e) {
+            return new ArrayList<>();
+        }
+        return new Gson().fromJson(b, type);
+    }
+
     public ArrayList<ArrayList<Scores>> fetchQuizzData(Long startDate, Long endDate, Long interval) {
         Type type = new TypeToken<ArrayList<ArrayList<Scores>>>() {
         }.getType();
@@ -193,12 +213,12 @@ public class QuizzAPI {
         QuizzAPI q = new QuizzAPI("http://localhost:6767");
 
         SimpleDateFormat ds = new SimpleDateFormat("dd/MM/yyyy 00:00:00");
-        String s = ds.format(new Date(System.currentTimeMillis()));
-        String sd = ds.format(new Date(System.currentTimeMillis() + 86400000L));
+        String s = ds.format(new Date(1569024000000l));
+        String sd = ds.format(new Date(1569024000000l + 86400000L*7*4));
         //    System.out.println(ds.parse(s, new ParsePosition(0)));
-        ArrayList<ArrayList<Scores>> scores = q.fetchQuizzData(s, sd, 1000L * 3600L);
+        ArrayList<ArrayList<Quizz>> scores = q.fetchQuizz(s, sd, 1000L * 3600L * 24);
         System.out.println(scores.size());
-        for (ArrayList<Scores> sdd : scores) {
+        for (ArrayList<Quizz> sdd : scores) {
             if (!sdd.isEmpty()) {
                 System.out.println(sdd.size());
             }
